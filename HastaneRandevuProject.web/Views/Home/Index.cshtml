@@ -1,26 +1,30 @@
-﻿@model List<AnaBilimDali>
+﻿@{
+    ViewData["Title"] = "Giriş";
+}
 
-<div class="text-center">
-    <h1 class="display-4">Hoş Geldiniz!</h1>
-</div>
-
-<div>
-    <h2>Anabilim Dalları</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Anabilim Dali ID</th>
-                <th>Adi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var anabilimDali in Model)
-            {
-                    <tr>
-                        <td>@anabilimDali.AnaBilimDaliID</td>
-                        <td>@anabilimDali.Adi</td>
-                    </tr>
-            }
-        </tbody>
-    </table>
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="text-center">Giriş Yap</h4>
+                </div>
+                <div class="card-body">
+                    <form action="@Url.Action("GirisKontrol", "Home")" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Kullanıcı Adı:</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Şifre:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Giriş Yap</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

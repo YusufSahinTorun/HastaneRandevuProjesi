@@ -6,8 +6,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+	  <ItemGroup>
+    <Compile Remove="Migration\**" />
+    <Content Remove="Migration\**" />
+    <EmbeddedResource Remove="Migration\**" />
+    <None Remove="Migration\**" />
+  </ItemGroup>
+
+	  <ItemGroup>
+	    <Content Include=".config\dotnet-tools.json" />
+	  </ItemGroup>
+		
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+    <PackageReference Include="Humanizer.Core" Version="2.10.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>

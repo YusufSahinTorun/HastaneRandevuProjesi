@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HastaneRandevuProject.web.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
@@ -7,4 +8,6 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<AnaBilimDali> AnaBilimDali { get; set; }
+    public DbSet<Doktorlar> Doktorlar { get; set; }
+    public DbSet<Kullanici> Kullanici { get; set;}
 }

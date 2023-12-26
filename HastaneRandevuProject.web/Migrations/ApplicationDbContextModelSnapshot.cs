@@ -21,22 +21,227 @@ namespace HastaneRandevuProject.web.Migrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("AnaBilimDali", b =>
-                {
-                    b.Property<int>("AnaBilimDaliID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("AnaBilimDaliID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AnaBilimDaliID"), 1L, 1);
+                b.Property<string>("Adi")
+                    .IsRequired()
+                    .HasColumnType("varchar")
+                    .HasMaxLength(255);
 
-                    b.Property<string>("Adi")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                b.HasKey("AnaBilimDaliID");
 
-                    b.HasKey("AnaBilimDaliID");
+                b.ToTable("AnaBilimDali");
+            });
 
-                    b.ToTable("AnaBilimDali");
-                });
+            modelBuilder.Entity("AnabilimDallari", b =>
+            {
+                b.Property<int>("AnaBilimDaliID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<string>("Adi")
+                    .IsRequired()
+                    .HasColumnType("nvarchar");
+
+                b.HasKey("AnaBilimDaliID")
+                    .HasName("PK_AnabilimDallari");
+
+                b.ToTable("AnabilimDallari");
+            });
+
+            modelBuilder.Entity("Doktorlar", b =>
+            {
+                b.Property<int>("DoktorID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<string>("Adi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<int>("PoliklinikID")
+                    .HasColumnType("int");
+
+                b.Property<string>("Soyadi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.HasKey("DoktorID");
+
+                b.HasIndex("PoliklinikID");
+
+                b.ToTable("Doktorlar");
+            });
+
+            modelBuilder.Entity("Hasta", b =>
+            {
+                b.Property<int>("HastaID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<string>("Adi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<string>("Cinsiyet")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<DateTime>("DogumTarihi")
+                    .HasColumnType("date");
+
+                b.Property<string>("Email")
+                    .HasColumnType("varchar");
+
+                b.Property<string>("Soyadi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<string>("Telefon")
+                    .HasColumnType("varchar");
+
+                b.HasKey("HastaID");
+
+                b.ToTable("Hasta");
+            });
+
+            modelBuilder.Entity("Poliklinikler", b =>
+            {
+                b.Property<int>("PoliklinikID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<string>("Adi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<int?>("AnaBilimDaliID")
+                    .HasColumnType("int");
+
+                b.HasKey("PoliklinikID");
+
+                b.HasIndex("AnaBilimDaliID");
+
+                b.ToTable("Poliklinikler");
+            });
+
+            modelBuilder.Entity("Kullanici", b =>
+            {
+                b.Property<int>("KullaniciID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<int>("HastaID")
+                    .HasColumnType("int");
+
+                b.Property<string>("KullaniciAdi")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<string>("Sifre")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.HasKey("KullaniciID");
+
+                b.HasIndex("HastaID");
+
+                b.ToTable("Kullanici");
+            });
+
+
+            modelBuilder.Entity("Randevu", b =>
+            {
+                b.Property<int>("RandevuID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<int?>("DoktorID")
+                    .HasColumnType("int");
+
+                b.Property<int?>("HastaID")
+                    .HasColumnType("int");
+
+                b.Property<string>("Saat")
+                    .IsRequired()
+                    .HasColumnType("varchar");
+
+                b.Property<DateTime>("Tarih")
+                    .HasColumnType("date");
+
+                b.HasKey("RandevuID");
+
+                b.HasIndex("DoktorID");
+
+                b.HasIndex("HastaID");
+
+                b.ToTable("Randevu");
+            });
+
+            modelBuilder.Entity("sysdiagrams", b =>
+            {
+                b.Property<int>("diagram_id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<byte[]>("definition")
+                    .HasColumnType("varbinary");
+
+                b.Property<string>("name")
+                    .IsRequired()
+                    .HasColumnType("nvarchar")
+                    .HasDefaultValueSql("(N'')");
+
+                b.Property<int>("principal_id")
+                    .HasColumnType("int");
+
+                b.Property<int?>("version")
+                    .HasColumnType("int");
+
+                b.HasKey("diagram_id");
+
+                b.HasIndex("name")
+                    .IsUnique()
+                    .HasDatabaseName("UK_principal_name");
+
+                b.ToTable("sysdiagrams");
+            });
+
+            modelBuilder.Entity("Doktorlar", b =>
+            {
+                b.HasOne("Poliklinikler", "Poliklinik")
+                    .WithMany("Doktorlar")
+                    .HasForeignKey("PoliklinikID");
+            });
+
+            modelBuilder.Entity("Poliklinikler", b =>
+            {
+                b.HasOne("AnaBilimDali", "AnaBilimDali")
+                    .WithMany("Poliklinikler")
+                    .HasForeignKey("AnaBilimDaliID");
+            });
+
+            modelBuilder.Entity("Randevu", b =>
+            {
+                b.HasOne("Doktorlar", "Doktor")
+                    .WithMany("Randevular")
+                    .HasForeignKey("DoktorID");
+
+                b.HasOne("Hasta", "Hasta")
+                    .WithMany("Randevular")
+                    .HasForeignKey("HastaID");
+            });
+
+            modelBuilder.Entity("sysdiagrams", b =>
+            {
+                b.HasOne("Principal")
+                    .WithMany()
+                    .HasForeignKey("principal_id")
+                    .HasConstraintName("FK__sysdiagra__princ__2D27B809");
+            });
 #pragma warning restore 612, 618
         }
     }
