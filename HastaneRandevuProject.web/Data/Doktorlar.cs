@@ -14,6 +14,5 @@ public class Doktorlar
     [Required]
     public string Soyadi { get; set; }
 
-    // Navigation property
-    public AnaBilimDali AnaBilimDali { get; set; }
+    
 }

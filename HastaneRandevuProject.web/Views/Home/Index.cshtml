@@ -10,7 +10,7 @@
                     <h4 class="text-center">Giriş Yap</h4>
                 </div>
                 <div class="card-body">
-                    <form action="@Url.Action("GirisKontrol", "Home")" method="post">
+                    <form action="/Home/Index" method="post">
                         <div class="mb-3">
                             <label for="username" class="form-label">Kullanıcı Adı:</label>
                             <input type="text" class="form-control" id="username" name="username" required>
@@ -27,4 +27,11 @@
             </div>
         </div>
     </div>
+</div>
+<div class="validation-summary-errors">
+    @if (!string.IsNullOrEmpty(ViewBag.PasswordError) || !string.IsNullOrEmpty(ViewBag.GeneralError))
+    {
+                <p>@ViewBag.PasswordError</p>
+                <p>@ViewBag.GeneralError</p>
+    }
 </div>

@@ -9,9 +9,19 @@ public class HomeController : Controller
     {
         _context = context;
     }
-    public ActionResult GirisKontrol(string username, string password)
+
+    [HttpGet]
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult Index(string username, string password)
     {
         // Veritabanında kullanıcıyı sorgula
+        ViewBag.PasswordError = null;
+        ViewBag.GeneralError = null;
         var kullanici = _context.Kullanici.FirstOrDefault(x => x.KullaniciAdi == username && x.Sifre == password);
 
         if (kullanici != null)
@@ -20,22 +30,24 @@ public class HomeController : Controller
             // Örneğin: FormsAuthentication.SetAuthCookie(username, false);
             // veya: HttpContext.Current.Session["KullaniciAdi"] = username;
 
-            return RedirectToAction("Privacy"); // Başarılı giriş durumunda yönlendirilecek sayfa
+            return RedirectToAction("Giris"); // Başarılı giriş durumunda yönlendirilecek sayfa
         }
         else
         {
+            // Şifre yanlış ise sadece şifre hatası eklenir
+            ViewBag.PasswordError = "Şifre hatalı.";
+
             // Kullanıcı doğrulanamadı, hata mesajı göster
-            ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı.");
+            ViewBag.GeneralError = "Kullanıcı adı veya şifre hatalı.";
+
+            // Hata durumunda tekrar Index sayfasını göster
             return View("Index");
         }
     }
 
-public IActionResult Index()
+    public IActionResult Giris()
     {
-        // Veritabanındaki AnaBilimDali tablosundaki verileri çek
-        var anabilimDallari = _context.AnaBilimDali.ToList();
-
-        // Bu verileri View'e geçir
-        return View(anabilimDallari);
+        return View();
     }
+
 }

@@ -11,6 +11,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+// Configure metoduna ekleme
+app.UseStaticFiles();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
