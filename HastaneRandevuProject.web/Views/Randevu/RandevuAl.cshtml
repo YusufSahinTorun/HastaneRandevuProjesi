@@ -2,17 +2,48 @@
 
 <h2>Randevu Al</h2>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("ActionAdi", "ControllerAdi", FormMethod.Post))
 {
         <div class="form-group">
+            <label for="SecilenPoliklinikID">Poliklinik Seç:</label>
+        @Html.DropDownListFor(m => m.SecilenPoliklinikID, new SelectList(Model.Poliklinikler, "PoliklinikID", "Adi"), "Poliklinik Seç", new { @class = "form-control", @onchange = "getDoktorlar()" })
+        </div>
+
+        <div class="form-group">
             <label for="SecilenDoktorID">Doktor Seç:</label>
-        @Html.DropDownListFor(m => m.SecilenDoktorID, new SelectList(Model.Doktorlar, "DoktorID", "Adi"), "Doktor Seç", new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control" })
         </div>
 
         <div class="form-group">
             <label for="SecilenTarih">Tarih Seç:</label>
-        @Html.DropDownListFor(m => m.SecilenTarih, new SelectList(Model.Tarihler), "Tarih Seç", new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.SecilenTarih, new SelectList(Model.Tarihler),"Tarih Seç", new { @class = "form-control" })
         </div>
 
         <button type="submit" class="btn btn-primary">Randevu Al</button>
+}
+
+@section scripts {
+        <script>
+            function getDoktorlar() {
+                var poliklinikID = $("#SecilenPoliklinikID").val();
+                if (poliklinikID !== "") {
+                    $.ajax({
+                        url: "/Randevu/GetDoktorlar", // Bu URL'yi uygun şekilde değiştir
+                        type: "GET",
+                        data: { poliklinikID: poliklinikID },
+                        success: function (data) {
+                            $("#SecilenDoktorID").empty();
+                            $.each(data, function (index, item) {
+                                $("#SecilenDoktorID").append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                } else {
+                    $("#SecilenDoktorID").empty();
+                }
+            }
+        </script>
 }
