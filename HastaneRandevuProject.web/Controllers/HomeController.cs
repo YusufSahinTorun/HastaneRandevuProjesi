@@ -30,6 +30,7 @@ public class HomeController : Controller
             // Örneğin: FormsAuthentication.SetAuthCookie(username, false);
             // veya: HttpContext.Current.Session["KullaniciAdi"] = username;
 
+            HttpContext.Session.SetInt32("HastaID", kullanici.HastaID);
             return RedirectToAction("Giris"); // Başarılı giriş durumunda yönlendirilecek sayfa
         }
         else
@@ -47,6 +48,7 @@ public class HomeController : Controller
 
     public IActionResult Giris()
     {
+        var hastaID = HttpContext.Session.GetInt32("HastaID");
         return View();
     }
 

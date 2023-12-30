@@ -19,25 +19,46 @@ namespace HastaneRandevuProject.web.Controllers
 
         public IActionResult RandevuAl()
         {
-            // Veritabanından poliklinikleri çek
-            var poliklinikler = _context.Poliklinikler.ToList();
+            var hastaID = HttpContext.Session.GetInt32("HastaID");
 
-            // İlk poliklinikteki doktorları çek
-            var ilkPoliklinikID = poliklinikler.FirstOrDefault()?.PoliklinikID;
-            var doktorlar = _context.Doktorlar
-                .Where(d => d.PoliklinikID == ilkPoliklinikID)
-                .ToList();
-
+            var doktorlar = _context.Doktorlar.ToList();
             var tarihler = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(i)).ToList();
+            var poliklinikler = _context.Poliklinikler.ToList();
 
             var model = new RandevuAlModel
             {
-                HastaID = 1, // Buraya gerçekten giriş yapmış hasta ID'si gelebilir
-                Poliklinikler = poliklinikler,
+                HastaID = hastaID ?? 0,
                 Doktorlar = doktorlar,
-                Tarihler = tarihler
+                Tarihler = tarihler,
+                Poliklinikler = poliklinikler
             };
 
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public IActionResult RandevuAl(RandevuAlModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var randevu = new Randevu
+                {
+                    HastaID = model.HastaID,
+                    // Diğer randevu bilgilerini modelden al
+                    // Örneğin: DoktorID, SecilenTarih vb.
+                    Saat = model.SecilenSaat, // Örnek olarak Saat bilgisini aldık
+                    Tarih = model.SecilenTarih // Örnek olarak Tarih bilgisini aldık
+                };
+
+                _context.Randevular.Add(randevu);
+                _context.SaveChanges();
+
+                return RedirectToAction("Randevularim", new { hastaID = model.HastaID });
+            }
+
+            // Eğer model geçerli değilse, tekrar RandevuAl view'ına dön
+            // Modeldeki validasyon hataları kullanıcılara gösterilecek
             return View(model);
         }
 
@@ -46,27 +67,19 @@ namespace HastaneRandevuProject.web.Controllers
             // PoliklinikID'ye göre doktorları veritabanından çek
             var doktorlar = _context.Doktorlar
                 .Where(d => d.PoliklinikID == poliklinikID)
-                .Select(d => new { value = d.DoktorID, text = d.Adi })
+                .Select(d => new { value = d.DoktorID, text = $"{d.Adi} {d.Soyadi}" })
                 .ToList();
 
             return Json(doktorlar);
         }
 
-        [HttpPost]
-        public IActionResult RandevuAl(RandevuAlModel model)
+        public IActionResult GetCalismaGunleri(int doktorID)
         {
-            if (ModelState.IsValid)
-            {
-                // Model doğrulaması geçtiğinde randevu kaydetme işlemleri burada yapılacak
-                // Seçilen doktor ve tarih bilgileri model.SecilenDoktorID ve model.SecilenTarih üzerinden alınabilir
+            var calismaGunleri = _context.CalismaGunleriVardiyalar
+                .Where(c => c.DoktorID == doktorID)
+                .ToList();
 
-                // Örnek olarak başarılı bir randevu aldığında başka bir sayfaya yönlendir
-                return RedirectToAction("Randevularim", new { hastaID = model.HastaID });
-            }
-
-            // Eğer model doğrulaması geçmezse, tekrar RandevuAl sayfasını göster
-            // Hatalı alanlar ModelState.Errors içinde bulunabilir
-            return View(model);
+            return Json(calismaGunleri);
         }
 
         public IActionResult Randevularim(int hastaID)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HastaneRandevuProject.web.Models;
+using System.ComponentModel.DataAnnotations;
 
 public class Doktorlar
 {
@@ -14,5 +15,7 @@ public class Doktorlar
     [Required]
     public string Soyadi { get; set; }
 
-    
+    public ICollection<CalismaGunleriVardiyalar> CalismaTarihi { get; set; }
+
+
 }

@@ -1,49 +1,66 @@
-﻿@model RandevuAlModel
+﻿<!-- RandevuAl.cshtml -->
+using HastaneRandevuProject.web.Data;
+using HastaneRandevuProject.web.Models;
+@model RandevuAlModel
 
-<h2>Randevu Al</h2>
 
-@using (Html.BeginForm("ActionAdi", "ControllerAdi", FormMethod.Post))
 {
         <div class="form-group">
             <label for="SecilenPoliklinikID">Poliklinik Seç:</label>
-        @Html.DropDownListFor(m => m.SecilenPoliklinikID, new SelectList(Model.Poliklinikler, "PoliklinikID", "Adi"), "Poliklinik Seç", new { @class = "form-control", @onchange = "getDoktorlar()" })
+    @{
+        if (Model.Poliklinikler != null)
+        {
+            @Html.DropDownListFor(m => m.SecilenPoliklinikID, new SelectList(Model.Poliklinikler, "PoliklinikID", "Adi"), "Poliklinik Seç", new { @class = "form-control", @onchange = "getDoktorlar()" })
+        }
+        else
+        {
+                                    <p>Poliklinik verileri yüklenemedi.</p>
+        }
+    }
         </div>
 
         <div class="form-group">
             <label for="SecilenDoktorID">Doktor Seç:</label>
-        @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control" })
+    @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control" })
+        </div>
+
+     <div class="form-group">
+            <label for="SecilenTarih">Tarih Seç:</label>
+    @Html.DropDownListFor(m => m.SecilenTarih, new SelectList(Model.Tarihler), "Tarih Seç", new { @class = "form-control" })
         </div>
 
         <div class="form-group">
-            <label for="SecilenTarih">Tarih Seç:</label>
-        @Html.DropDownListFor(m => m.SecilenTarih, new SelectList(Model.Tarihler),"Tarih Seç", new { @class = "form-control" })
+            <label for="SecilenSaat">Saat Seç:</label>
+    @Html.TextBoxFor(m => m.SecilenSaat, new { @class = "form-control", type = "time" }) <!-- Saati temsil eden input -->
         </div>
+
 
         <button type="submit" class="btn btn-primary">Randevu Al</button>
 }
 
-@section scripts {
-        <script>
-            function getDoktorlar() {
-                var poliklinikID = $("#SecilenPoliklinikID").val();
-                if (poliklinikID !== "") {
-                    $.ajax({
-                        url: "/Randevu/GetDoktorlar", // Bu URL'yi uygun şekilde değiştir
-                        type: "GET",
-                        data: { poliklinikID: poliklinikID },
-                        success: function (data) {
-                            $("#SecilenDoktorID").empty();
-                            $.each(data, function (index, item) {
-                                $("#SecilenDoktorID").append('<option value="' + item.value + '">' + item.text + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
+<script>
+    function getCalismaGunleri() {
+        var doktorID = $("#SecilenDoktorID").val();
+        if (doktorID !== "") {
+            $.ajax({
+                url: "/Randevu/GetCalismaGunleri",
+                type: "GET",
+                data: { doktorID: doktorID },
+                success: function (data) {
+                    $("#SecilenCalismaGunu").empty();
+                    $("#SecilenVardiyaSaati").empty();
+                    $.each(data, function (index, item) {
+                        $("#SecilenCalismaGunu").append('<option value="' + item.CalismaGunu + '">' + item.CalismaGunu + '</option>');
+                        $("#SecilenVardiyaSaati").append('<option value="' + item.VardiyaSaati + '">' + item.VardiyaSaati + '</option>');
                     });
-                } else {
-                    $("#SecilenDoktorID").empty();
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
                 }
-            }
-        </script>
-}
+            });
+        } else {
+            $("#SecilenCalismaGunu").empty();
+            $("#SecilenVardiyaSaati").empty();
+        }
+    }
+</script>
