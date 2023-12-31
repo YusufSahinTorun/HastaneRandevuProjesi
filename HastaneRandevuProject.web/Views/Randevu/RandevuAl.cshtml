@@ -1,66 +1,115 @@
-﻿<!-- RandevuAl.cshtml -->
-using HastaneRandevuProject.web.Data;
-using HastaneRandevuProject.web.Models;
-@model RandevuAlModel
+﻿@model RandevuAlModel
 
+<h2>Randevu Al</h2>
 
+@using (Html.BeginForm("RandevuAl", "Randevu", FormMethod.Post))
 {
         <div class="form-group">
             <label for="SecilenPoliklinikID">Poliklinik Seç:</label>
-    @{
-        if (Model.Poliklinikler != null)
-        {
-            @Html.DropDownListFor(m => m.SecilenPoliklinikID, new SelectList(Model.Poliklinikler, "PoliklinikID", "Adi"), "Poliklinik Seç", new { @class = "form-control", @onchange = "getDoktorlar()" })
+        @{
+            if (Model.Poliklinikler != null)
+            {
+                @Html.DropDownListFor(m => m.SecilenPoliklinikID, new SelectList(Model.Poliklinikler, "PoliklinikID", "Adi"), "Poliklinik Seç", new { @class = "form-control", @onchange = "getDoktorlar()" })
+            }
+            else
+            {
+                            <p>Poliklinik verileri yüklenemedi.</p>
+            }
         }
-        else
-        {
-                                    <p>Poliklinik verileri yüklenemedi.</p>
-        }
-    }
         </div>
 
         <div class="form-group">
             <label for="SecilenDoktorID">Doktor Seç:</label>
-    @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control" })
-        </div>
-
-     <div class="form-group">
-            <label for="SecilenTarih">Tarih Seç:</label>
-    @Html.DropDownListFor(m => m.SecilenTarih, new SelectList(Model.Tarihler), "Tarih Seç", new { @class = "form-control" })
+        @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control", @onchange = "getCalismaGunleri()" })
         </div>
 
         <div class="form-group">
-            <label for="SecilenSaat">Saat Seç:</label>
-    @Html.TextBoxFor(m => m.SecilenSaat, new { @class = "form-control", type = "time" }) <!-- Saati temsil eden input -->
+            <label for="Tarih">Günü Seç:</label>
+        @Html.DropDownListFor(m => m.Tarih, Enumerable.Empty<SelectListItem>(), "Günü Seç", new { @class = "form-control" })
         </div>
 
+        <div class="form-group">
+            <label for="Saat">Saati Seç:</label>
+        @Html.DropDownListFor(m => m.Saat, Enumerable.Empty<SelectListItem>(), "Saati Seç", new { @class = "form-control" })
+        </div>
 
         <button type="submit" class="btn btn-primary">Randevu Al</button>
 }
 
-<script>
-    function getCalismaGunleri() {
-        var doktorID = $("#SecilenDoktorID").val();
-        if (doktorID !== "") {
-            $.ajax({
-                url: "/Randevu/GetCalismaGunleri",
-                type: "GET",
-                data: { doktorID: doktorID },
-                success: function (data) {
-                    $("#SecilenCalismaGunu").empty();
-                    $("#SecilenVardiyaSaati").empty();
-                    $.each(data, function (index, item) {
-                        $("#SecilenCalismaGunu").append('<option value="' + item.CalismaGunu + '">' + item.CalismaGunu + '</option>');
-                        $("#SecilenVardiyaSaati").append('<option value="' + item.VardiyaSaati + '">' + item.VardiyaSaati + '</option>');
+@section scripts {
+        <script>
+            function getDoktorlar() {
+                var poliklinikID = $("#SecilenPoliklinikID").val();
+                if (poliklinikID !== "") {
+                    $.ajax({
+                        url: "/Randevu/GetDoktorlar",
+                        type: "GET",
+                        data: { poliklinikID: poliklinikID },
+                        success: function (data) {
+                            $("#SecilenDoktorID").empty();
+                            $("#Tarih").empty();
+                            $("#Saat").empty();
+                            $.each(data, function (index, item) {
+                                $("#SecilenDoktorID").append('<option value="' + item.value + '">' + item.text + '</option>');
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
                     });
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
+                } 
+            }
+
+             function getCalismaGunleri() {
+     var doktorID = $("#SecilenDoktorID").val();
+                if (doktorID !== "") {
+                    $.ajax({
+                        url: "/Randevu/GetCalismaGunleri",
+                        type: "GET",
+                        data: { doktorID: doktorID },
+                        success: function (data) {
+                            $("#Tarih").empty();
+                            $("#Saat").empty();
+
+                            $.each(data, function (index, item) {
+                                var truncatedDate = item.text.substring(0, 10)
+                                    console.log("VardiyaTipi: " + item.VardiyaTipi);
+                                     updateSaatiSecDropdown(item.VardiyaTipi);
+
+                                $("#Tarih").append('<option value="' + item.value + '">' + truncatedDate + '</option>');
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
                 }
-            });
-        } else {
-            $("#SecilenCalismaGunu").empty();
-            $("#SecilenVardiyaSaati").empty();
-        }
-    }
-</script>
+            }
+
+                        function updateSaatiSecDropdown(vardiyaTipi) {
+                $("#Saat").empty();
+
+                // Uygun saat aralığını belirle
+                var saatAraligi;
+                switch (vardiyaTipi) {
+                    case 1:
+                        saatAraligi = ["08:00", "09:00", /*...*/, "16:00"];
+                        break;
+                    case 2:
+                        saatAraligi = ["16:00", "17:00", /*...*/, "24:00"];
+                        break;
+                    case 3:
+                        saatAraligi = ["24:00", "01:00", /*...*/, "08:00"];
+                        break;
+                    default:
+                        saatAraligi = [];
+                        break;
+                }
+
+                // Saat dropdown'ını güncelle
+                $.each(saatAraligi, function (index, saat) {
+                    $("#Saat").append('<option value="' + saat + '">' + saat + '</option>');
+                });
+            }
+        </script>
+}

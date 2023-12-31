@@ -15,7 +15,6 @@ public class Doktorlar
     [Required]
     public string Soyadi { get; set; }
 
-    public ICollection<CalismaGunleriVardiyalar> CalismaTarihi { get; set; }
 
 
 }

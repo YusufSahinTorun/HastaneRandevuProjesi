@@ -242,6 +242,35 @@ namespace HastaneRandevuProject.web.Migrations
                     .HasForeignKey("principal_id")
                     .HasConstraintName("FK__sysdiagra__princ__2D27B809");
             });
+            modelBuilder.Entity("CalismaGunleriVardiyalar", b =>
+            {
+                b.Property<int>("ID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                b.Property<int?>("DoktorID")
+                    .HasColumnType("int");
+
+                b.Property<DateTime>("CalismaGunu")
+                    .HasColumnType("date");
+
+                b.Property<int>("VardiyaTipi")
+                    .HasColumnType("int");
+
+                b.HasKey("ID");
+
+                b.HasIndex("DoktorID");
+
+                b.ToTable("CalismaGunleriVardiyalar");
+            });
+
+            modelBuilder.Entity("Doktorlar", b =>
+            {
+                b.HasMany("CalismaGunleriVardiyalar", "CalismaGunleri")
+                    .WithOne("Doktor")
+                    .HasForeignKey("DoktorID");
+            });
+
 #pragma warning restore 612, 618
         }
     }

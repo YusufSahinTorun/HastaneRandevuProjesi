@@ -22,20 +22,17 @@ namespace HastaneRandevuProject.web.Controllers
             var hastaID = HttpContext.Session.GetInt32("HastaID");
 
             var doktorlar = _context.Doktorlar.ToList();
-            var tarihler = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(i)).ToList();
             var poliklinikler = _context.Poliklinikler.ToList();
 
             var model = new RandevuAlModel
             {
                 HastaID = hastaID ?? 0,
                 Doktorlar = doktorlar,
-                Tarihler = tarihler,
                 Poliklinikler = poliklinikler
             };
 
             return View(model);
         }
-
 
         [HttpPost]
         public IActionResult RandevuAl(RandevuAlModel model)
@@ -45,10 +42,9 @@ namespace HastaneRandevuProject.web.Controllers
                 var randevu = new Randevu
                 {
                     HastaID = model.HastaID,
-                    // Diğer randevu bilgilerini modelden al
-                    // Örneğin: DoktorID, SecilenTarih vb.
-                    Saat = model.SecilenSaat, // Örnek olarak Saat bilgisini aldık
-                    Tarih = model.SecilenTarih // Örnek olarak Tarih bilgisini aldık
+                    DoktorID = model.SecilenDoktorID,
+                    Tarih = model.Tarih, // Buradaki Tarih özelliğini uygun bir şekilde güncellemeniz gerekiyor
+                    Saat = model.Saat // Saat özelliğini uygun bir şekilde güncellemeniz gerekiyor
                 };
 
                 _context.Randevular.Add(randevu);
@@ -61,6 +57,7 @@ namespace HastaneRandevuProject.web.Controllers
             // Modeldeki validasyon hataları kullanıcılara gösterilecek
             return View(model);
         }
+
 
         public IActionResult GetDoktorlar(int poliklinikID)
         {
@@ -77,10 +74,13 @@ namespace HastaneRandevuProject.web.Controllers
         {
             var calismaGunleri = _context.CalismaGunleriVardiyalar
                 .Where(c => c.DoktorID == doktorID)
+                .Select(c => new { value = c.ID, text = $"{c.CalismaGunu}", VardiyaTipi = $"{c.VardiyaTipi}" })
                 .ToList();
 
             return Json(calismaGunleri);
+
         }
+
 
         public IActionResult Randevularim(int hastaID)
         {
