@@ -1,0 +1,31 @@
+﻿@model DoktorEkleModel
+
+@{
+    ViewData["Title"] = "Doktor Ekle";
+}
+
+<h2>Doktor Ekle</h2>
+
+<form asp-controller="Home" asp-action="DoktorEkle" method="post">
+    <div class="form-group">
+        <label for="Adi">Adı:</label>
+        <input asp-for="Adi" class="form-control" />
+        <span asp-validation-for="Adi" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Soyadi">Soyadı:</label>
+        <input asp-for="Soyadi" class="form-control" />
+        <span asp-validation-for="Soyadi" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="PoliklinikID">Poliklinik:</label>
+        <select asp-for="PoliklinikID" asp-items="@Model.Poliklinikler" class="form-control">
+            <option value="">Poliklinik Seç</option>
+        </select>
+        <span asp-validation-for="PoliklinikID" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Doktor Ekle</button>
+</form>

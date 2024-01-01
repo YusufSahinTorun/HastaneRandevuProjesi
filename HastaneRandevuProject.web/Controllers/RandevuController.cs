@@ -37,14 +37,17 @@ namespace HastaneRandevuProject.web.Controllers
         [HttpPost]
         public IActionResult RandevuAl(RandevuAlModel model)
         {
+            var hastaID = HttpContext.Session.GetInt32("HastaID");
+
             if (ModelState.IsValid)
             {
                 var randevu = new Randevu
                 {
-                    HastaID = model.HastaID,
+                    HastaID = hastaID,
                     DoktorID = model.SecilenDoktorID,
-                    Tarih = model.Tarih, // Buradaki Tarih özelliğini uygun bir şekilde güncellemeniz gerekiyor
-                    Saat = model.Saat // Saat özelliğini uygun bir şekilde güncellemeniz gerekiyor
+                    PoliklinikID = model.SecilenPoliklinikID, // Eklendi
+                    Tarih = model.Tarih,
+                    Saat = model.Saat
                 };
 
                 _context.Randevular.Add(randevu);
@@ -52,10 +55,20 @@ namespace HastaneRandevuProject.web.Controllers
 
                 return RedirectToAction("Randevularim", new { hastaID = model.HastaID });
             }
+            else
+            {
+                // Model valid değilse, hataları göster
+                foreach (var key in ModelState.Keys)
+                {
+                    var state = ModelState[key];
+                    foreach (var error in state.Errors)
+                    {
+                        Console.WriteLine($"{key}: {error.ErrorMessage}");
+                    }
+                }
+                return Json(model);
 
-            // Eğer model geçerli değilse, tekrar RandevuAl view'ına dön
-            // Modeldeki validasyon hataları kullanıcılara gösterilecek
-            return View(model);
+            }
         }
 
 
@@ -74,13 +87,21 @@ namespace HastaneRandevuProject.web.Controllers
         {
             var calismaGunleri = _context.CalismaGunleriVardiyalar
                 .Where(c => c.DoktorID == doktorID)
-                .Select(c => new { value = c.ID, text = $"{c.CalismaGunu}", VardiyaTipi = $"{c.VardiyaTipi}" })
+                .Select(c => new { value = c.ID, text = c.CalismaGunu, typeofv = c.VardiyaTipi })
                 .ToList();
 
             return Json(calismaGunleri);
 
         }
+        public IActionResult GetSaatler(int id)
+        {
+            var Saatler = _context.CalismaGunleriVardiyalar
+                .Where(d => d.ID == id)
+                .Select(d => new { value = d.ID, typeofvar = d.VardiyaTipi })
+                .ToList();
 
+            return Json(Saatler);
+        }
 
         public IActionResult Randevularim(int hastaID)
         {

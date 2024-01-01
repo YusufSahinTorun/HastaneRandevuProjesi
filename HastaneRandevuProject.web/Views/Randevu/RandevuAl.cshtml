@@ -4,8 +4,8 @@
 
 @using (Html.BeginForm("RandevuAl", "Randevu", FormMethod.Post))
 {
-        <div class="form-group">
-            <label for="SecilenPoliklinikID">Poliklinik Seç:</label>
+            <div class="form-group">
+                <label for="SecilenPoliklinikID">Poliklinik Seç:</label>
         @{
             if (Model.Poliklinikler != null)
             {
@@ -13,103 +13,135 @@
             }
             else
             {
-                            <p>Poliklinik verileri yüklenemedi.</p>
+                                        <p>Poliklinik verileri yüklenemedi.</p>
             }
         }
-        </div>
+            </div>
 
-        <div class="form-group">
-            <label for="SecilenDoktorID">Doktor Seç:</label>
+            <div class="form-group">
+                <label for="SecilenDoktorID">Doktor Seç:</label>
         @Html.DropDownListFor(m => m.SecilenDoktorID, Enumerable.Empty<SelectListItem>(), "Doktor Seç", new { @class = "form-control", @onchange = "getCalismaGunleri()" })
-        </div>
+            </div>
 
-        <div class="form-group">
-            <label for="Tarih">Günü Seç:</label>
-        @Html.DropDownListFor(m => m.Tarih, Enumerable.Empty<SelectListItem>(), "Günü Seç", new { @class = "form-control" })
-        </div>
+            <div class="form-group">
+                <label for="Tarih">Günü Seç:</label>
+        @Html.DropDownListFor(m => m.Tarih, Enumerable.Empty<SelectListItem>(), "Günü Seç", new { @class = "form-control" ,@onchange = "getSaatler()"})
+            </div>
 
-        <div class="form-group">
-            <label for="Saat">Saati Seç:</label>
+            <div class="form-group">
+                <label for="Saat">Saati Seç:</label>
         @Html.DropDownListFor(m => m.Saat, Enumerable.Empty<SelectListItem>(), "Saati Seç", new { @class = "form-control" })
-        </div>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Randevu Al</button>
+            <button type="submit" class="btn btn-primary">Randevu Al</button>
 }
 
 @section scripts {
-        <script>
-            function getDoktorlar() {
-                var poliklinikID = $("#SecilenPoliklinikID").val();
-                if (poliklinikID !== "") {
-                    $.ajax({
-                        url: "/Randevu/GetDoktorlar",
-                        type: "GET",
-                        data: { poliklinikID: poliklinikID },
-                        success: function (data) {
-                            $("#SecilenDoktorID").empty();
-                            $("#Tarih").empty();
-                            $("#Saat").empty();
-                            $.each(data, function (index, item) {
-                                $("#SecilenDoktorID").append('<option value="' + item.value + '">' + item.text + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
-                    });
-                } 
-            }
-
-             function getCalismaGunleri() {
-     var doktorID = $("#SecilenDoktorID").val();
-                if (doktorID !== "") {
-                    $.ajax({
-                        url: "/Randevu/GetCalismaGunleri",
-                        type: "GET",
-                        data: { doktorID: doktorID },
-                        success: function (data) {
-                            $("#Tarih").empty();
-                            $("#Saat").empty();
-
-                            $.each(data, function (index, item) {
-                                var truncatedDate = item.text.substring(0, 10)
-                                    console.log("VardiyaTipi: " + item.VardiyaTipi);
-                                     updateSaatiSecDropdown(item.VardiyaTipi);
-
-                                $("#Tarih").append('<option value="' + item.value + '">' + truncatedDate + '</option>');
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            }
-
-                        function updateSaatiSecDropdown(vardiyaTipi) {
-                $("#Saat").empty();
-
-                // Uygun saat aralığını belirle
-                var saatAraligi;
-                switch (vardiyaTipi) {
-                    case 1:
-                        saatAraligi = ["08:00", "09:00", /*...*/, "16:00"];
-                        break;
-                    case 2:
-                        saatAraligi = ["16:00", "17:00", /*...*/, "24:00"];
-                        break;
-                    case 3:
-                        saatAraligi = ["24:00", "01:00", /*...*/, "08:00"];
-                        break;
-                    default:
-                        saatAraligi = [];
-                        break;
+            <script>
+                function getDoktorlar() {
+                    var poliklinikID = $("#SecilenPoliklinikID").val();
+                    if (poliklinikID !== "") {
+                        $.ajax({
+                            url: "/Randevu/GetDoktorlar",
+                            type: "GET",
+                            data: { poliklinikID: poliklinikID },
+                            success: function (data) {
+                                $("#SecilenDoktorID").empty();
+                                $("#Tarih").empty();
+                                $("#Saat").empty();
+                                $.each(data, function (index, item) {
+                                    $("#SecilenDoktorID").append('<option value="' + item.value + '">' + item.text + '</option>');
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    } 
                 }
 
-                // Saat dropdown'ını güncelle
-                $.each(saatAraligi, function (index, saat) {
-                    $("#Saat").append('<option value="' + saat + '">' + saat + '</option>');
-                });
-            }
-        </script>
+                 function getCalismaGunleri() {
+         var doktorID = $("#SecilenDoktorID").val();
+                    if (doktorID !== "") {
+                        $.ajax({
+                            url: "/Randevu/GetCalismaGunleri",
+                            type: "GET",
+                            data: { doktorID: doktorID },
+                            success: function (data) {
+                                $("#Tarih").empty();
+
+
+                                $.each(data, function (index, item) {
+                                    var truncatedDate = item.text.substring(0, 10)
+
+
+
+
+                                    $("#Tarih").append('<option value="' + item.value + '">' + item.text + '</option>');
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                }
+
+
+                            function updateSaatiSecDropdown(vardiyaTipi) {
+                    $("#Saat").empty();
+
+                    // Uygun saat aralığını belirle
+                    var saatAraligi;
+                    switch (vardiyaTipi) {
+
+        case 1:
+            saatAraligi = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"];
+            break;
+        case 2:
+            saatAraligi = ["16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
+            break;
+        case 3:
+            saatAraligi = ["24:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00"];
+
+                            break;
+                        default:
+                            saatAraligi = [];
+                            break;
+                    }
+
+                    // Saat dropdown'ını güncelle
+                    $.each(saatAraligi, function (index, saat) {
+                        $("#Saat").append('<option value="' + saat + '">' + saat + '</option>');
+                    });
+
+                }
+
+
+
+    function getSaatler() {
+        var id = $("#Tarih").val();
+        if (Tarih !== "") {
+                            $.ajax({
+                                url: "/Randevu/GetSaatler",
+                                type: "GET",
+                                data: { id: id },
+                                success: function (data) {
+
+
+                                    $.each(data, function (index, item) {
+                                            updateSaatiSecDropdown(item.typeofvar)
+
+                                    });
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    }
+        
+    
+                            
+            </script>
 }
